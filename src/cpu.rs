@@ -1,13 +1,15 @@
 pub struct CPU {
-    registers: ::register::Registers,
-    mmu:       ::mmu::MMU,
+    registers:  ::register::Registers,
+    mmu:        ::mmu::MMU,
+    halted:     bool,
 }
 
 impl CPU {
     pub fn new() -> CPU {
         CPU {
-            registers: ::register::Registers::new(),
-            mmu:       ::mmu::MMU::new(),
+            registers:  ::register::Registers::new(),
+            mmu:        ::mmu::MMU::new(),
+            halted:     false,
         }
     }
 
@@ -186,5 +188,16 @@ impl CPU {
             0xFE => { let byte = self.fetch_byte(); self.cp(byte);  1  },                           // CP A,#
             other => panic!("Instruction not implemented!"),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn cpu_creates_properly() {
+        let mut cpu = CPU::new();
+        assert!(!cpu.halted);
     }
 }
