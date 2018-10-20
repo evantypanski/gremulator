@@ -178,12 +178,12 @@ impl CPU {
             0xBD => { self.cp(copy_registers.l); 1  },              // CP A,L
             0xBE => { let mem_val = self.mmu.fetch(copy_registers.hl()); self.cp(mem_val); 1 },     // CP A,[HL]
             0xBF => { self.cp(copy_registers.a); 1  },              // CP A,A
-            0xC6 => { self.add(copy_registers.b); 1 },              // IMPLEMENT ADD A,#
-            0xD6 => { self.sub(copy_registers.b); 1 },              // IMPLEMENT SUB A,#
-            0xE6 => { self.and(copy_registers.b); 1 },              // IMPLEMENT AND A,#
-            0xEE => { self.xor(copy_registers.b); 1 },              // IMPLEMENT XOR A,#
-            0xF6 => { self.or(copy_registers.b); 1  },              // IMPLEMENT OR A,#
-            0xFE => { self.cp(copy_registers.b); 1  },              // IMPLEMENT CP A,#
+            0xC6 => { let byte = self.fetch_byte(); self.add(byte); 1 },                            // ADD A,#
+            0xD6 => { let byte = self.fetch_byte(); self.sub(byte); 1 },                            // SUB A,#
+            0xE6 => { let byte = self.fetch_byte(); self.and(byte); 1 },                            // AND A,#
+            0xEE => { let byte = self.fetch_byte(); self.xor(byte); 1 },                            // XOR A,#
+            0xF6 => { let byte = self.fetch_byte(); self.or(byte);  1  },                           // OR A,#
+            0xFE => { let byte = self.fetch_byte(); self.cp(byte);  1  },                           // CP A,#
             other => panic!("Instruction not implemented!"),
         }
     }
