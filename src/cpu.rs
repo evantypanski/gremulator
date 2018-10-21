@@ -59,15 +59,18 @@ impl CPU {
     }
 
     fn cp(&mut self, val: u8) {
-        // TODO: Manipulate flags
+        // cp is simply a subtraction without changing the accumulator value
+        let saved_reg = self.registers.a;
+        self.sub(val);
+        self.registers.a = saved_reg;
     }
 
     // All operations
-
     pub fn ops(&mut self, opcode: u8) -> u8 {
         // Copy registers to avoid immutable/mutable reference with ALU ops
         let copy_registers = self.registers;
         match opcode {
+            0x00 => { 1 },                                          // NOP
             0x06 => { self.registers.b = self.fetch_byte(); 1 },    // LD B,n
             0x0E => { self.registers.c = self.fetch_byte(); 1 },    // LD C,n
             0x16 => { self.registers.d = self.fetch_byte(); 1 },    // LD D,n
