@@ -40,6 +40,18 @@ impl CPU {
 
     fn add(&mut self, val: u8) {
         self.registers.a = self.registers.a + val;
+
+        let mut set = self.registers.a == 0;
+        self.registers.z_flag(set);
+
+        set = false;
+        self.registers.n_flag(set);
+
+        set = (((self.registers.a & 0xf) + (val & 0xf)) & 0x10) == 0x10;
+        self.registers.h_flag(set);
+
+        set = self.registers.a + val > 0xff;
+        self.registers.c_flag(set);
     }
 
     fn sub(&mut self, val: u8) {

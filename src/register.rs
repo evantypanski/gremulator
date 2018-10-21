@@ -37,23 +37,23 @@ impl Registers {
         ((self.h as u16) << 8) + self.l as u16
     }
 
-    pub fn set_z_flag(&mut self, set: bool) {
-        self.set_flag(set, Z_FLAG_OFFSET);
+    pub fn z_flag(&mut self, set: bool) {
+        self.flag(set, Z_FLAG_OFFSET);
     }
 
-    pub fn set_n_flag(&mut self, set: bool) {
-        self.set_flag(set, N_FLAG_OFFSET);
+    pub fn n_flag(&mut self, set: bool) {
+        self.flag(set, N_FLAG_OFFSET);
     }
 
-    pub fn set_h_flag(&mut self, set: bool) {
-        self.set_flag(set, H_FLAG_OFFSET);
+    pub fn h_flag(&mut self, set: bool) {
+        self.flag(set, H_FLAG_OFFSET);
     }
 
-    pub fn set_c_flag(&mut self, set: bool) {
-        self.set_flag(set, C_FLAG_OFFSET);
+    pub fn c_flag(&mut self, set: bool) {
+        self.flag(set, C_FLAG_OFFSET);
     }
 
-    fn set_flag(&mut self, set: bool, offset: u8) {
+    fn flag(&mut self, set: bool, offset: u8) {
         if (set) { self.f |= (1 << offset);  }
         else     { self.f &= !(1 << offset); }
     }
@@ -67,16 +67,16 @@ mod tests {
     fn flags_set_properly() {
         let mut reg = Registers::new();
         reg.f = 0b01010000;
-        reg.set_z_flag(true);
+        reg.z_flag(true);
         assert_eq!(format!("{:b}", reg.f), "11010000");
 
-        reg.set_n_flag(false);
+        reg.n_flag(false);
         assert_eq!(format!("{:b}", reg.f), "10010000");
 
-        reg.set_h_flag(true);
+        reg.h_flag(true);
         assert_eq!(format!("{:b}", reg.f), "10110000");
 
-        reg.set_c_flag(false);
+        reg.c_flag(false);
         assert_eq!(format!("{:b}", reg.f), "10100000");
     }
 }
