@@ -1,12 +1,10 @@
 pub struct MMU {
-    a: u8,
     mbc: ::mbc::MBC,
 }
 
 impl MMU {
     pub fn new() -> MMU {
         MMU {
-            a: 0,
             mbc: ::mbc::MBC::new(),
         }
     }
