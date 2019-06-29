@@ -1,10 +1,15 @@
+extern crate wasm_bindgen;
+use wasm_bindgen::prelude::*;
+
 pub struct CPU {
     registers:  ::register::Registers,
     mmu:        ::mmu::MMU,
     halted:     bool,
 }
 
+#[wasm_bindgen]
 impl CPU {
+    #[wasm_bindgen(constructor)]
     pub fn new() -> CPU {
         CPU {
             registers:  ::register::Registers::new(),
@@ -31,9 +36,11 @@ impl CPU {
         self.registers.c
     }
 
+    #[wasm_bindgen]
     pub fn cycle(&mut self) -> u8 {
-        let opcode = self.fetch_byte();
-        self.ops(opcode)
+        1
+        //let opcode = self.fetch_byte();
+        //self.ops(opcode)
     }
 
     // ALU
@@ -41,33 +48,37 @@ impl CPU {
     fn add(&mut self, val: u8) {
         self.registers.a = self.registers.a + val;
 
-        let mut set = self.registers.a == 0;
-        self.registers.z_flag(set);
-
-        set = false;
-        self.registers.n_flag(set);
-
-        set = (((self.registers.a & 0xf) + (val & 0xf)) & 0x10) == 0x10;
-        self.registers.h_flag(set);
-
-        set = self.registers.a + val > 0xff;
-        self.registers.c_flag(set);
+        let zSet = self.registers.a == 0;
+        let hSet = (((self.registers.a & 0xf) + (val & 0xf)) & 0x10) == 0x10;
+        let cSet = self.registers.a + val > 0xff;
+        self.setFlags(zSet, false, hSet, cSet);
     }
 
     fn sub(&mut self, val: u8) {
-        self.registers.a = self.registers.a - val
+        self.registers.a = self.registers.a - val;
+
+        let zSet = self.registers.a == 0;
+        let hSet = (self.registers.a & 0xf) - (val & 0xf) < 0;
+        let cSet = self.registers.a < val;
+        self.setFlags(zSet, true, hSet, cSet);
     }
 
     fn and(&mut self, val: u8) {
-        self.registers.a = self.registers.a & val
+        self.registers.a = self.registers.a & val;
+        let zSet = self.registers.a == 0;
+        self.setFlags(zSet, false, true, false);
     }
 
     fn or(&mut self, val: u8) {
-        self.registers.a = self.registers.a | val
+        self.registers.a = self.registers.a | val;
+        let zSet = self.registers.a == 0;
+        self.setFlags(zSet, false, false, false);
     }
 
     fn xor(&mut self, val: u8) {
-        self.registers.a = self.registers.a ^ val
+        self.registers.a = self.registers.a ^ val;
+        let zSet = self.registers.a == 0;
+        self.setFlags(zSet, false, false, false);
     }
 
     fn cp(&mut self, val: u8) {
@@ -75,6 +86,13 @@ impl CPU {
         let saved_reg = self.registers.a;
         self.sub(val);
         self.registers.a = saved_reg;
+    }
+
+    fn setFlags(&mut self, zSet: bool, nSet: bool, hSet: bool, cSet: bool) {
+        self.registers.z_flag(zSet);
+        self.registers.n_flag(nSet);
+        self.registers.h_flag(hSet);
+        self.registers.c_flag(cSet);
     }
 
     // All operations

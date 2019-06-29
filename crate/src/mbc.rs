@@ -18,9 +18,10 @@ impl MBC {
     }
 
     fn read_rom() -> Vec<u8> {
-        let mut file = File::open("roms/test/ld.gb").expect("Unable to open");
+        /*let mut file = File::open("roms/test/add_num.gb").expect("Unable to open");
         let mut contents = vec![];
         file.read_to_end(&mut contents);
-        contents
+        contents*/
+        vec![]
     }
 }
