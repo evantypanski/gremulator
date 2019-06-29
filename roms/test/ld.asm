@@ -1,4 +1,4 @@
 SECTION "main",ROM0
-  add a,[HL]
+  add a,b
   and a,b
   halt

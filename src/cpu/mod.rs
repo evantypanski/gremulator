@@ -1,3 +1,5 @@
+mod alu;
+
 pub struct CPU {
     registers:  ::register::Registers,
     mmu:        ::mmu::MMU,
@@ -37,23 +39,6 @@ impl CPU {
     }
 
     // ALU
-
-    fn add(&mut self, val: u8) {
-        self.registers.a = self.registers.a + val;
-
-        let mut set = self.registers.a == 0;
-        self.registers.z_flag(set);
-
-        set = false;
-        self.registers.n_flag(set);
-
-        set = (((self.registers.a & 0xf) + (val & 0xf)) & 0x10) == 0x10;
-        self.registers.h_flag(set);
-
-        set = self.registers.a + val > 0xff;
-        self.registers.c_flag(set);
-    }
-
     fn sub(&mut self, val: u8) {
         self.registers.a = self.registers.a - val
     }
@@ -147,14 +132,14 @@ impl CPU {
             0x7D => { self.registers.a = self.registers.l; 1  },    // LD A,L
             0x7E => { self.registers.a = self.registers.l; 1  },    // IMPLEMENT LD A,(HL)
             0x7F => { self.registers.a = self.registers.a; 1  },    // LD A,A
-            0x80 => { self.add(copy_registers.b); 1 },              // ADD A,B
-            0x81 => { self.add(copy_registers.c); 1 },              // ADD A,C
-            0x82 => { self.add(copy_registers.d); 1 },              // ADD A,D
-            0x83 => { self.add(copy_registers.e); 1 },              // ADD A,E
-            0x84 => { self.add(copy_registers.h); 1 },              // ADD A,H
-            0x85 => { self.add(copy_registers.l); 1 },              // ADD A,L
-            0x86 => { let mem_val = self.mmu.fetch(copy_registers.hl()); self.add(mem_val); 1 },    // ADD A,[HL]
-            0x87 => { self.add(copy_registers.a); 1 },              // ADD A,A
+            0x80 => { ::cpu::alu::add(&mut self.registers.a, Some(self.registers.b), &mut self.registers.f); 1 }, // ADD A,B
+            0x81 => { ::cpu::alu::add(&mut self.registers.a, Some(self.registers.c), &mut self.registers.f); 1 }, // ADD A,C
+            0x82 => { ::cpu::alu::add(&mut self.registers.a, Some(self.registers.d), &mut self.registers.f); 1 }, // ADD A,D
+            0x83 => { ::cpu::alu::add(&mut self.registers.a, Some(self.registers.e), &mut self.registers.f); 1 }, // ADD A,E
+            0x84 => { ::cpu::alu::add(&mut self.registers.a, Some(self.registers.h), &mut self.registers.f); 1 }, // ADD A,H
+            0x85 => { ::cpu::alu::add(&mut self.registers.a, Some(self.registers.l), &mut self.registers.f); 1 }, // ADD A,L
+            0x86 => { let mem_val = self.mmu.fetch(copy_registers.hl()); ::cpu::alu::add(&mut self.registers.a, Some(mem_val), &mut self.registers.f); 1 },    // ADD A,[HL]
+            0x87 => { ::cpu::alu::add(&mut self.registers.a, None, &mut self.registers.f); 1 }, // ADD A,A
             0x90 => { self.sub(copy_registers.b); 1 },              // SUB A,B
             0x91 => { self.sub(copy_registers.c); 1 },              // SUB A,C
             0x92 => { self.sub(copy_registers.d); 1 },              // SUB A,D
@@ -195,7 +180,7 @@ impl CPU {
             0xBD => { self.cp(copy_registers.l); 1  },              // CP A,L
             0xBE => { let mem_val = self.mmu.fetch(copy_registers.hl()); self.cp(mem_val); 1 },     // CP A,[HL]
             0xBF => { self.cp(copy_registers.a); 1  },              // CP A,A
-            0xC6 => { let byte = self.fetch_byte(); self.add(byte); 1 },                            // ADD A,#
+            0xC6 => { let byte = self.fetch_byte(); ::cpu::alu::add(&mut self.registers.a, Some(byte), &mut self.registers.f); 1 }, // ADD A,#
             0xD6 => { let byte = self.fetch_byte(); self.sub(byte); 1 },                            // SUB A,#
             0xE6 => { let byte = self.fetch_byte(); self.and(byte); 1 },                            // AND A,#
             0xEE => { let byte = self.fetch_byte(); self.xor(byte); 1 },                            // XOR A,#
