@@ -5,11 +5,32 @@ pub fn add(accumulator: &mut u8, val: Option<u8>, flags: &mut u8) {
     // Not using wrapping_add to check more easily result > 0xff later
     result = *accumulator as u16 + to_add as u16;
 
-    set_flags(flags,
-              result & 0xff == 0,
-              false,
-              (((*accumulator & 0xf) + (to_add & 0xf)) & 0x10) == 0x10,
-              result > 0xff);
+    set_flags(
+        flags,
+        result & 0xff == 0,
+        false,
+        (((*accumulator & 0xf) + (to_add & 0xf)) & 0x10) == 0x10,
+        result > 0xff,
+    );
+
+    *accumulator = result as u8;
+}
+
+pub fn add_carry(accumulator: &mut u8, val: Option<u8>, flags: &mut u8) {
+    let result: u16;
+    let carry = (*flags & 0b00010000) >> 4;
+    let to_add = val.unwrap_or(*accumulator) + carry;
+
+    // Not using wrapping_add to check more easily result > 0xff later
+    result = *accumulator as u16 + to_add as u16;
+
+    set_flags(
+        flags,
+        result & 0xff == 0,
+        false,
+        (((*accumulator & 0xf) + (to_add & 0xf)) & 0x10) == 0x10,
+        result > 0xff,
+    );
 
     *accumulator = result as u8;
 }
@@ -20,11 +41,13 @@ pub fn sub(accumulator: &mut u8, val: Option<u8>, flags: &mut u8) {
 
     result = (*accumulator).wrapping_sub(to_sub);
 
-    set_flags(flags,
-              result == 0,
-              true,
-              (*accumulator & 0xf) < (to_sub & 0xf),
-              *accumulator < to_sub);
+    set_flags(
+        flags,
+        result == 0,
+        true,
+        (*accumulator & 0xf) < (to_sub & 0xf),
+        *accumulator < to_sub,
+    );
 
     *accumulator = result;
 }
@@ -53,10 +76,7 @@ pub fn cp(accumulator: u8, val: Option<u8>, flags: &mut u8) {
 }
 
 fn set_flags(flags: &mut u8, z: bool, n: bool, h: bool, c: bool) {
-    *flags = ((z as u8) << 7)
-        | ((n as u8) << 6)
-        | ((h as u8) << 5)
-        | ((c as u8) << 4);
+    *flags = ((z as u8) << 7) | ((n as u8) << 6) | ((h as u8) << 5) | ((c as u8) << 4);
 }
 
 #[cfg(test)]
@@ -118,6 +138,18 @@ mod tests {
         add(&mut accumulator, Some(val), &mut flags);
         println!("{}", accumulator);
         assert_eq!(flags, 0b10110000);
+    }
+
+    #[test]
+    fn adc_carry_applies_properly() {
+        let mut accumulator = 40;
+        let val = 1;
+        // Only carry flag set
+        let mut flags = 0b00010000;
+        add_carry(&mut accumulator, Some(val), &mut flags);
+        assert_eq!(accumulator, 42);
+        // Flags should now clear.
+        assert_eq!(flags, 0);
     }
 
     #[test]
