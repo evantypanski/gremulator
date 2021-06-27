@@ -45,9 +45,29 @@ impl CPU {
         match opcode {
             // NOP
             0x00 => 1,
+            // INC B
+            0x04 => {
+                ::cpu::alu::inc(&mut self.registers.b, &mut self.registers.f);
+                1
+            }
+            // DEC B
+            0x05 => {
+                ::cpu::alu::dec(&mut self.registers.b, &mut self.registers.f);
+                1
+            }
             // LD B,n
             0x06 => {
                 self.registers.b = self.fetch_byte();
+                1
+            }
+            // INC C
+            0x0C => {
+                ::cpu::alu::inc(&mut self.registers.c, &mut self.registers.f);
+                1
+            }
+            // DEC B
+            0x0D => {
+                ::cpu::alu::dec(&mut self.registers.c, &mut self.registers.f);
                 1
             }
             // LD C,n
@@ -55,9 +75,29 @@ impl CPU {
                 self.registers.c = self.fetch_byte();
                 1
             }
+            // INC D
+            0x14 => {
+                ::cpu::alu::inc(&mut self.registers.d, &mut self.registers.f);
+                1
+            }
+            // DEC D
+            0x15 => {
+                ::cpu::alu::dec(&mut self.registers.d, &mut self.registers.f);
+                1
+            }
             // LD D,n
             0x16 => {
                 self.registers.d = self.fetch_byte();
+                1
+            }
+            // INC E
+            0x1C => {
+                ::cpu::alu::inc(&mut self.registers.e, &mut self.registers.f);
+                1
+            }
+            // DEC E
+            0x1D => {
+                ::cpu::alu::dec(&mut self.registers.e, &mut self.registers.f);
                 1
             }
             // LD E,n
@@ -65,9 +105,29 @@ impl CPU {
                 self.registers.e = self.fetch_byte();
                 1
             }
+            // INC H
+            0x24 => {
+                ::cpu::alu::inc(&mut self.registers.h, &mut self.registers.f);
+                1
+            }
+            // DEC H
+            0x25 => {
+                ::cpu::alu::dec(&mut self.registers.h, &mut self.registers.f);
+                1
+            }
             // LD H,n
             0x26 => {
                 self.registers.h = self.fetch_byte();
+                1
+            }
+            // INC L
+            0x2C => {
+                ::cpu::alu::inc(&mut self.registers.l, &mut self.registers.f);
+                1
+            }
+            // DEC L
+            0x2D => {
+                ::cpu::alu::dec(&mut self.registers.e, &mut self.registers.f);
                 1
             }
             // LD L,n
@@ -75,9 +135,28 @@ impl CPU {
                 self.registers.l = self.fetch_byte();
                 1
             }
+            // IMPLEMENT INC (HL)
+            0x24 => 1,
+            // IMPLEMENT DEC (HL)
+            0x25 => 1,
             // IMPLEMENT LD (HL),n
             0x36 => {
                 self.registers.h = self.registers.l;
+                1
+            }
+            // INC A
+            0x3C => {
+                ::cpu::alu::inc(&mut self.registers.a, &mut self.registers.f);
+                1
+            }
+            // DEC A
+            0x3D => {
+                ::cpu::alu::dec(&mut self.registers.a, &mut self.registers.f);
+                1
+            }
+            // LD A,n
+            0x3E => {
+                self.registers.a = self.fetch_byte();
                 1
             }
             // LD B,B

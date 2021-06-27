@@ -75,6 +75,36 @@ pub fn cp(accumulator: u8, val: Option<u8>, flags: &mut u8) {
     sub(&mut mutable_accumulator, val, flags);
 }
 
+pub fn inc(accumulator: &mut u8, flags: &mut u8) {
+    let result = *accumulator as u16 + 1;
+
+    set_flags(
+        flags,
+        result & 0xff == 0,
+        false,
+        (((*accumulator & 0xf) + 1) & 0x10) == 0x10,
+        // Unchanged
+        ((*flags & 0b00010000) >> 4) == 1,
+    );
+
+    *accumulator = result as u8;
+}
+
+pub fn dec(accumulator: &mut u8, flags: &mut u8) {
+    let result = (*accumulator).wrapping_sub(1);
+
+    set_flags(
+        flags,
+        result & 0xff == 0,
+        true,
+        (*accumulator & 0xf) < 1,
+        // Unchanged
+        ((*flags & 0b00010000) >> 4) == 1,
+    );
+
+    *accumulator = result as u8;
+}
+
 fn set_flags(flags: &mut u8, z: bool, n: bool, h: bool, c: bool) {
     *flags = ((z as u8) << 7) | ((n as u8) << 6) | ((h as u8) << 5) | ((c as u8) << 4);
 }
@@ -333,5 +363,47 @@ mod tests {
         let mut flags = 0;
         cp(accumulator, Some(val), &mut flags);
         assert_eq!(flags, 0b01010000);
+    }
+
+    #[test]
+    fn inc_simple() {
+        let mut accumulator = 41;
+        let mut flags = 0b00000000;
+        inc(&mut accumulator, &mut flags);
+        assert_eq!(accumulator, 42);
+        // Flags should now clear.
+        assert_eq!(flags, 0);
+    }
+
+    #[test]
+    fn inc_flags() {
+        let mut accumulator = 255;
+        // Only carry flag set, should stay set no matter what.
+        let mut flags = 0b00010000;
+        inc(&mut accumulator, &mut flags);
+        assert_eq!(accumulator, 0);
+        // Flags should now clear.
+        assert_eq!(flags, 0b10110000);
+    }
+
+    #[test]
+    fn dec_simple() {
+        let mut accumulator = 43;
+        let mut flags = 0b00000000;
+        dec(&mut accumulator, &mut flags);
+        assert_eq!(accumulator, 42);
+        // Flags should now clear.
+        assert_eq!(flags, 0b01000000);
+    }
+
+    #[test]
+    fn dec_flags() {
+        let mut accumulator = 0;
+        // Only carry flag set, should stay set no matter what.
+        let mut flags = 0b00010000;
+        dec(&mut accumulator, &mut flags);
+        assert_eq!(accumulator, 255);
+        // Flags should now clear.
+        assert_eq!(flags, 0b01110000);
     }
 }
