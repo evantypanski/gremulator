@@ -1,7 +1,9 @@
 extern crate gremulator;
 
+use gremulator::cpu::cpu::CPU;
+
 fn main() {
-    let mut cpu = gremulator::cpu::CPU::new();
+    let mut cpu = CPU::new();
     while cpu.cycle() != 66 {
         println!("{}", cpu.get_a());
     }
