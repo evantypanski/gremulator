@@ -4,7 +4,8 @@ use gremulator::cpu::cpu::CPU;
 
 fn main() {
     let mut cpu = CPU::new();
-    while cpu.cycle() != 66 {
+    while !cpu.halted {
+        cpu.cycle();
         println!("{}", cpu.get_a());
     }
 }
