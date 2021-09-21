@@ -1,3 +1,9 @@
+extern crate log;
+
+use std::io::Error;
+
+use self::log::{info, trace};
+
 pub struct CPU {
     registers: ::register::Registers,
     mmu: ::mmu::MMU,
@@ -5,12 +11,14 @@ pub struct CPU {
 }
 
 impl CPU {
-    pub fn new() -> CPU {
-        CPU {
+    pub fn new() -> Result<CPU, Error> {
+        info!("Created new CPU");
+        let mmu = ::mmu::MMU::new()?;
+        Ok(CPU {
             registers: ::register::Registers::new(),
-            mmu: ::mmu::MMU::new(),
+            mmu: mmu,
             halted: false,
-        }
+        })
     }
 
     pub fn fetch_byte(&mut self) -> u8 {
@@ -33,6 +41,7 @@ impl CPU {
 
     pub fn cycle(&mut self) -> u8 {
         let opcode = self.fetch_byte();
+        trace!("Cycle on opcode {}", opcode);
         self.ops(opcode)
     }
 
@@ -397,8 +406,9 @@ impl CPU {
                 self.registers.h = self.registers.l;
                 8
             }
-            // IMPLEMENT HALT, 4t should be return
+            // HALT
             0x76 => {
+                info!("CPU halting");
                 self.halted = true;
                 4
             }

@@ -1,15 +1,15 @@
 use std::fs::File;
-use std::io::Read;
+use std::io::{Error, Read};
 
 pub struct MBC {
     rom: Vec<u8>,
 }
 
 impl MBC {
-    pub fn new() -> MBC {
-        MBC {
-            rom: Self::read_rom(),
-        }
+    pub fn new() -> Result<MBC, Error> {
+        Ok(MBC {
+            rom: Self::read_rom()?,
+        })
     }
 
     pub fn fetch_rom(&self, addr: u16) -> u8 {
@@ -17,10 +17,10 @@ impl MBC {
         self.rom[addr as usize]
     }
 
-    fn read_rom() -> Vec<u8> {
+    fn read_rom() -> Result<Vec<u8>, Error> {
         let mut file = File::open("roms/test/ld.gb").expect("Unable to open");
         let mut contents = vec![];
-        file.read_to_end(&mut contents);
-        contents
+        file.read_to_end(&mut contents)?;
+        Ok(contents)
     }
 }
