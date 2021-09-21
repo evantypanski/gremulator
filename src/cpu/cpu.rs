@@ -52,6 +52,12 @@ impl CPU {
         match opcode {
             // NOP
             0x00 => 4,
+            // LD BC,u16
+            0x01 => {
+                let immediate = ((self.fetch_byte() as u16) << 8) + (self.fetch_byte() as u16);
+                self.registers.set_bc(immediate);
+                12
+            }
             // INC B
             0x04 => {
                 ::cpu::alu::inc(&mut self.registers.b, &mut self.registers.f);
@@ -81,6 +87,12 @@ impl CPU {
             0x0E => {
                 self.registers.c = self.fetch_byte();
                 8
+            }
+            // LD DE,u16
+            0x11 => {
+                let immediate = ((self.fetch_byte() as u16) << 8) + (self.fetch_byte() as u16);
+                self.registers.set_de(immediate);
+                12
             }
             // INC D
             0x14 => {
@@ -112,6 +124,12 @@ impl CPU {
                 self.registers.e = self.fetch_byte();
                 8
             }
+            // LD HL,u16
+            0x21 => {
+                let immediate = ((self.fetch_byte() as u16) << 8) + (self.fetch_byte() as u16);
+                self.registers.set_hl(immediate);
+                12
+            }
             // INC H
             0x24 => {
                 ::cpu::alu::inc(&mut self.registers.h, &mut self.registers.f);
@@ -141,6 +159,12 @@ impl CPU {
             0x2E => {
                 self.registers.l = self.fetch_byte();
                 8
+            }
+            // LD SP,u16
+            0x31 => {
+                let immediate = ((self.fetch_byte() as u16) << 8) + (self.fetch_byte() as u16);
+                self.registers.sp = immediate;
+                12
             }
             // IMPLEMENT INC (HL)
             0x34 => 12,
