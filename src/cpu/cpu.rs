@@ -46,6 +46,17 @@ impl CPU {
                 self.registers.set_bc(immediate);
                 12
             }
+            // LD (BC), A
+            0x02 => {
+                // TODO
+                8
+            }
+            // INC BC
+            0x03 => {
+                // Does not update flags, so don't need to go through ALU.
+                self.registers.set_bc(self.registers.bc().wrapping_add(1));
+                8
+            }
             // INC B
             0x04 => {
                 ::cpu::alu::inc(&mut self.registers.b, &mut self.registers.f);
@@ -81,6 +92,17 @@ impl CPU {
                 let immediate = ((self.fetch_byte() as u16) << 8) + (self.fetch_byte() as u16);
                 self.registers.set_de(immediate);
                 12
+            }
+            // LD (DE),A
+            0x12 => {
+                // TODO
+                8
+            }
+            // INC DE
+            0x13 => {
+                // Does not update flags, so don't need to go through ALU.
+                self.registers.set_de(self.registers.de().wrapping_add(1));
+                8
             }
             // INC D
             0x14 => {
@@ -118,6 +140,17 @@ impl CPU {
                 self.registers.set_hl(immediate);
                 12
             }
+            // LD (HL+),A
+            0x22 => {
+                // TODO
+                8
+            }
+            // INC HL
+            0x23 => {
+                // Does not update flags, so don't need to go through ALU.
+                self.registers.set_hl(self.registers.hl().wrapping_add(1));
+                8
+            }
             // INC H
             0x24 => {
                 ::cpu::alu::inc(&mut self.registers.h, &mut self.registers.f);
@@ -153,6 +186,17 @@ impl CPU {
                 let immediate = ((self.fetch_byte() as u16) << 8) + (self.fetch_byte() as u16);
                 self.registers.sp = immediate;
                 12
+            }
+            // LD (HL-),A
+            0x32 => {
+                // TODO
+                8
+            }
+            // INC SP
+            0x33 => {
+                // Does not update flags, so don't need to go through ALU.
+                self.registers.sp = self.registers.sp.wrapping_add(1);
+                8
             }
             // IMPLEMENT INC (HL)
             0x34 => 12,
