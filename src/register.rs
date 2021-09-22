@@ -18,12 +18,21 @@ pub struct Registers {
 // Add display for easier debugging.
 impl fmt::Display for Registers {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "a: {}, b: {}, c: {}, d: {}, e: {}, h: {}, l: {}, ",
-               self.a, self.b, self.c, self.d, self.e, self.h, self.l)?;
+        write!(
+            f,
+            "a: {}, b: {}, c: {}, d: {}, e: {}, h: {}, l: {}, ",
+            self.a, self.b, self.c, self.d, self.e, self.h, self.l
+        )?;
         write!(f, "sp: {}, pc: {}, ", self.sp, self.pc)?;
 
-        write!(f, "flags: Z: {}, N: {}, H: {}, C: {}",
-               self.z(), self.n(), self.h(), self.c())
+        write!(
+            f,
+            "flags: Z: {}, N: {}, H: {}, C: {}",
+            self.z(),
+            self.n(),
+            self.h(),
+            self.c()
+        )
     }
 }
 
