@@ -5,7 +5,7 @@ use std::io::Error;
 use self::log::{info, trace};
 
 pub struct CPU {
-    registers: ::register::Registers,
+    pub registers: ::register::Registers,
     mmu: ::mmu::MMU,
     pub halted: bool,
 }
@@ -25,18 +25,6 @@ impl CPU {
         let byte = self.mmu.fetch(self.registers.pc);
         self.registers.pc += 1;
         byte
-    }
-
-    pub fn get_a(&self) -> u8 {
-        self.registers.a
-    }
-
-    pub fn get_b(&self) -> u8 {
-        self.registers.b
-    }
-
-    pub fn get_c(&self) -> u8 {
-        self.registers.c
     }
 
     pub fn cycle(&mut self) -> u8 {

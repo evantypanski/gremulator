@@ -1,4 +1,5 @@
 use std::convert::TryInto;
+use std::fmt;
 
 #[derive(Copy, Clone)]
 pub struct Registers {
@@ -12,6 +13,18 @@ pub struct Registers {
     pub sp: u16,
     pub pc: u16,
     pub f: u8,
+}
+
+// Add display for easier debugging.
+impl fmt::Display for Registers {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "a: {}, b: {}, c: {}, d: {}, e: {}, h: {}, l: {}, ",
+               self.a, self.b, self.c, self.d, self.e, self.h, self.l)?;
+        write!(f, "sp: {}, pc: {}, ", self.sp, self.pc)?;
+
+        write!(f, "flags: Z: {}, N: {}, H: {}, C: {}",
+               self.z(), self.n(), self.h(), self.c())
+    }
 }
 
 impl Registers {
@@ -54,5 +67,21 @@ impl Registers {
         self.h = h_num;
         let l_num: u8 = (num & 0xFF).try_into().unwrap();
         self.l = l_num;
+    }
+
+    pub fn z(&self) -> bool {
+        self.f >> 7 == 1
+    }
+
+    pub fn n(&self) -> bool {
+        self.f >> 6 == 1
+    }
+
+    pub fn h(&self) -> bool {
+        self.f >> 5 == 1
+    }
+
+    pub fn c(&self) -> bool {
+        self.f >> 4 == 1
     }
 }

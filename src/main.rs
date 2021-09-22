@@ -14,7 +14,7 @@ fn main() -> Result<(), Error> {
     while !cpu.halted {
         cpu.cycle();
         // Useful to debug for now.
-        trace!("Register A after cycle: {}", cpu.get_a());
+        trace!("Registers after cycle: {}", cpu.registers);
     }
     info!("Gremulator halted! Exiting...");
     Ok(())
