@@ -72,6 +72,32 @@ impl CPU {
                 self.registers.b = self.fetch_byte();
                 8
             }
+            // RLCA
+            0x07 => {
+                // TODO
+                4
+            }
+            // LD (u16), SP
+            0x08 => {
+                // TODO
+                20
+            }
+            // ADD HL, BC
+            0x09 => {
+                // TODO
+                8
+            }
+            // LD A,(BC)
+            0x0A => {
+                // TODO
+                8
+            }
+            // DEC BC
+            0x0B => {
+                // Does not update flags, so don't need to go through ALU.
+                self.registers.set_bc(self.registers.bc().wrapping_sub(1));
+                8
+            }
             // INC C
             0x0C => {
                 ::cpu::alu::inc(&mut self.registers.c, &mut self.registers.f);
@@ -117,6 +143,32 @@ impl CPU {
             // LD D,n
             0x16 => {
                 self.registers.d = self.fetch_byte();
+                8
+            }
+            // RLA
+            0x17 => {
+                // TODO
+                4
+            }
+            // JR i8
+            0x18 => {
+                // TODO
+                12
+            }
+            // ADD HL, DE
+            0x19 => {
+                // TODO
+                8
+            }
+            // LD A,(DE)
+            0x1A => {
+                // TODO
+                8
+            }
+            // DEC BC
+            0x1B => {
+                // Does not update flags, so don't need to go through ALU.
+                self.registers.set_de(self.registers.de().wrapping_sub(1));
                 8
             }
             // INC E
@@ -166,6 +218,33 @@ impl CPU {
                 self.registers.h = self.fetch_byte();
                 8
             }
+            // DAA
+            0x27 => {
+                // TODO
+                4
+            }
+            // JR Z,i8
+            0x28 => {
+                // TODO
+                // Note: time is 8-12 - determine which
+                8
+            }
+            // ADD HL, HL
+            0x29 => {
+                // TODO
+                8
+            }
+            // LD A,(HL+)
+            0x2A => {
+                // TODO
+                8
+            }
+            // DEC HL
+            0x2B => {
+                // Does not update flags, so don't need to go through ALU.
+                self.registers.set_hl(self.registers.hl().wrapping_sub(1));
+                8
+            }
             // INC L
             0x2C => {
                 ::cpu::alu::inc(&mut self.registers.l, &mut self.registers.f);
@@ -206,6 +285,33 @@ impl CPU {
             0x36 => {
                 self.registers.h = self.registers.l;
                 12
+            }
+            // SCF
+            0x37 => {
+                // TODO
+                4
+            }
+            // JR C,i8
+            0x38 => {
+                // TODO
+                // Note: time is 8-12 - determine which
+                8
+            }
+            // ADD HL, SP
+            0x39 => {
+                // TODO
+                8
+            }
+            // LD A,(HL-)
+            0x3A => {
+                // TODO
+                8
+            }
+            // DEC SP
+            0x3B => {
+                // Does not update flags, so don't need to go through ALU.
+                self.registers.sp = self.registers.sp.wrapping_sub(1);
+                8
             }
             // INC A
             0x3C => {
