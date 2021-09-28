@@ -303,7 +303,7 @@ impl CPU {
             }
             // SCF
             0x37 => {
-                // TODO
+                ::cpu::alu::scf(&mut self.registers.f);
                 4
             }
             // JR C,i8
@@ -345,7 +345,7 @@ impl CPU {
             }
             // CCF
             0x3F => {
-                // TODO
+                ::cpu::alu::ccf(&mut self.registers.f);
                 4
             }
             // LD B,B

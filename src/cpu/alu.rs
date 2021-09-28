@@ -168,6 +168,18 @@ pub fn cpl(accumulator: &mut u8, flags: &mut u8) {
     set_flags(flags, z_flag(flags) == 1, true, true, c_flag(flags) == 1);
 }
 
+// Set carry flag
+pub fn scf(flags: &mut u8) {
+    set_flags(flags, z_flag(flags) == 1, false, false, true);
+}
+
+// Complement carry flag
+pub fn ccf(flags: &mut u8) {
+    // c_flag == 0 -> set
+    // c_flag == 1 -> reset
+    set_flags(flags, z_flag(flags) == 1, false, false, c_flag(flags) == 0);
+}
+
 // Utility methods for flags
 fn set_flags(flags: &mut u8, z: bool, n: bool, h: bool, c: bool) {
     *flags = ((z as u8) << 7) | ((n as u8) << 6) | ((h as u8) << 5) | ((c as u8) << 4);
@@ -575,5 +587,21 @@ mod tests {
         cpl(&mut accumulator, &mut flags);
         assert_eq!(accumulator, 0b01010101);
         assert_eq!(flags, 0b11110000);
+    }
+
+    #[test]
+    fn scf_trivial() {
+        let mut flags = 0b10100000;
+        scf(&mut flags);
+        assert_eq!(flags, 0b10010000);
+    }
+
+    #[test]
+    fn ccf_trivial() {
+        let mut flags = 0b10110000;
+        ccf(&mut flags);
+        assert_eq!(flags, 0b10000000);
+        ccf(&mut flags);
+        assert_eq!(flags, 0b10010000);
     }
 }
