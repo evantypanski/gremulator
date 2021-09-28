@@ -163,6 +163,11 @@ pub fn daa(accumulator: &mut u8, flags: &mut u8) {
     set_flags(flags, *accumulator == 0, prev_n, false, set_c);
 }
 
+pub fn cpl(accumulator: &mut u8, flags: &mut u8) {
+    *accumulator = !*accumulator;
+    set_flags(flags, z_flag(flags) == 1, true, true, c_flag(flags) == 1);
+}
+
 // Utility methods for flags
 fn set_flags(flags: &mut u8, z: bool, n: bool, h: bool, c: bool) {
     *flags = ((z as u8) << 7) | ((n as u8) << 6) | ((h as u8) << 5) | ((c as u8) << 4);
@@ -178,6 +183,10 @@ fn h_flag(flags: &u8) -> u8 {
 
 fn n_flag(flags: &u8) -> u8 {
     (flags >> 6) & 1
+}
+
+fn z_flag(flags: &u8) -> u8 {
+    (flags >> 7) & 1
 }
 
 #[cfg(test)]
@@ -557,5 +566,14 @@ mod tests {
         rr(&mut accumulator, &mut flags);
         assert_eq!(accumulator, 0b01010101);
         assert_eq!(flags, 0b00000000);
+    }
+
+    #[test]
+    fn cpl_trivial() {
+        let mut accumulator = 0b10101010;
+        let mut flags = 0b10010000;
+        cpl(&mut accumulator, &mut flags);
+        assert_eq!(accumulator, 0b01010101);
+        assert_eq!(flags, 0b11110000);
     }
 }

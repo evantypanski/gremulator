@@ -272,7 +272,7 @@ impl CPU {
             }
             // CPL
             0x2F => {
-                // TODO
+                ::cpu::alu::cpl(&mut self.registers.a, &mut self.registers.f);
                 4
             }
             // LD SP,u16
