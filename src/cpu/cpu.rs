@@ -74,7 +74,7 @@ impl CPU {
             }
             // RLCA
             0x07 => {
-                // TODO
+                ::cpu::alu::rlc(&mut self.registers.a, &mut self.registers.f);
                 4
             }
             // LD (u16), SP
@@ -113,6 +113,11 @@ impl CPU {
                 self.registers.c = self.fetch_byte();
                 8
             }
+            // RRCA
+            0x0F => {
+                ::cpu::alu::rrc(&mut self.registers.a, &mut self.registers.f);
+                4
+            }
             // LD DE,u16
             0x11 => {
                 let immediate = ((self.fetch_byte() as u16) << 8) + (self.fetch_byte() as u16);
@@ -147,7 +152,7 @@ impl CPU {
             }
             // RLA
             0x17 => {
-                // TODO
+                ::cpu::alu::rl(&mut self.registers.a, &mut self.registers.f);
                 4
             }
             // JR i8
@@ -185,6 +190,11 @@ impl CPU {
             0x1E => {
                 self.registers.e = self.fetch_byte();
                 8
+            }
+            // RRA
+            0x1F => {
+                ::cpu::alu::rr(&mut self.registers.a, &mut self.registers.f);
+                4
             }
             // LD HL,u16
             0x21 => {
@@ -260,6 +270,11 @@ impl CPU {
                 self.registers.l = self.fetch_byte();
                 8
             }
+            // CPL
+            0x2F => {
+                // TODO
+                4
+            }
             // LD SP,u16
             0x31 => {
                 let immediate = ((self.fetch_byte() as u16) << 8) + (self.fetch_byte() as u16);
@@ -327,6 +342,11 @@ impl CPU {
             0x3E => {
                 self.registers.a = self.fetch_byte();
                 8
+            }
+            // CCF
+            0x3F => {
+                // TODO
+                4
             }
             // LD B,B
             0x40 => {
@@ -1119,7 +1139,7 @@ mod tests {
 
     #[test]
     fn cpu_creates_properly() {
-        let cpu = CPU::new();
+        let cpu = CPU::new().unwrap();
         assert!(!cpu.halted);
     }
 }

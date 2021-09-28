@@ -105,8 +105,43 @@ pub fn dec(accumulator: &mut u8, flags: &mut u8) {
     *accumulator = result as u8;
 }
 
+// Rotate left circular - AKA with carry flag in loop.
+pub fn rlc(reg: &mut u8, flags: &mut u8) {
+    let bit7_set = ((*reg >> 7) & 1) == 1;
+    let prev_c = c_flag(flags);
+    *reg = (*reg << 1) | prev_c;
+    set_flags(flags, false, false, false, bit7_set);
+}
+
+// Rotate right circular - AKA with carry flag in loop.
+pub fn rrc(reg: &mut u8, flags: &mut u8) {
+    let bit0_set = (*reg & 1) == 1;
+    let prev_c = c_flag(flags);
+    *reg = (prev_c << 7) | (*reg >> 1);
+    set_flags(flags, false, false, false, bit0_set);
+}
+
+// Rotate left - leave carry flag out of rotate, but does get updated.
+pub fn rl(reg: &mut u8, flags: &mut u8) {
+    let bit7_set = ((*reg >> 7) & 1) == 1;
+    *reg = reg.rotate_left(1);
+    set_flags(flags, false, false, false, bit7_set);
+}
+
+// Rotate right - leave carry flag out of rotate, but does get updated.
+pub fn rr(reg: &mut u8, flags: &mut u8) {
+    let bit0_set = (*reg & 1) == 1;
+    *reg = reg.rotate_right(1);
+    set_flags(flags, false, false, false, bit0_set);
+}
+
+// Utility methods for flags
 fn set_flags(flags: &mut u8, z: bool, n: bool, h: bool, c: bool) {
     *flags = ((z as u8) << 7) | ((n as u8) << 6) | ((h as u8) << 5) | ((c as u8) << 4);
+}
+
+fn c_flag(flags: &u8) -> u8 {
+    (flags >> 4) & 1
 }
 
 #[cfg(test)]
@@ -405,5 +440,87 @@ mod tests {
         assert_eq!(accumulator, 255);
         // Flags should now clear.
         assert_eq!(flags, 0b01110000);
+    }
+
+    #[test]
+    fn rlc_no_carry() {
+        let mut accumulator = 0b11001100;
+        let mut flags = 0b00000000;
+        rlc(&mut accumulator, &mut flags);
+        assert_eq!(accumulator, 0b10011000);
+        // Carry gets set but don't use it.
+        assert_eq!(flags, 0b00010000);
+    }
+
+    #[test]
+    fn rlc_carry() {
+        let mut accumulator = 0b01010100;
+        // Carry flag
+        let mut flags = 0b00010000;
+        rlc(&mut accumulator, &mut flags);
+        assert_eq!(accumulator, 0b10101001);
+        assert_eq!(flags, 0b00000000);
+    }
+
+    #[test]
+    fn rrc_no_carry() {
+        let mut accumulator = 0b11001101;
+        let mut flags = 0b00000000;
+        rrc(&mut accumulator, &mut flags);
+        assert_eq!(accumulator, 0b01100110);
+        // Carry gets set but don't use it.
+        assert_eq!(flags, 0b00010000);
+    }
+
+    #[test]
+    fn rrc_carry() {
+        let mut accumulator = 0b01010100;
+        // Carry flag
+        let mut flags = 0b00010000;
+        rrc(&mut accumulator, &mut flags);
+        assert_eq!(accumulator, 0b10101010);
+        assert_eq!(flags, 0b00000000);
+    }
+
+    #[test]
+    fn rl_no_carry() {
+        let mut accumulator = 0b10101010;
+        let mut flags = 0b00000000;
+        rl(&mut accumulator, &mut flags);
+        assert_eq!(accumulator, 0b01010101);
+        // Carry gets set but don't use it.
+        assert_eq!(flags, 0b00010000);
+    }
+
+
+    #[test]
+    fn rl_carry() {
+        // Just make sure rotate ignores carries
+        let mut accumulator = 0b01010101;
+        // Carry flag
+        let mut flags = 0b00010000;
+        rl(&mut accumulator, &mut flags);
+        assert_eq!(accumulator, 0b10101010);
+        assert_eq!(flags, 0b00000000);
+    }
+
+    #[test]
+    fn rr_no_carry() {
+        let mut accumulator = 0b01010101;
+        let mut flags = 0b00000000;
+        rr(&mut accumulator, &mut flags);
+        assert_eq!(accumulator, 0b10101010);
+        // Carry gets set but don't use it.
+        assert_eq!(flags, 0b00010000);
+    }
+
+    #[test]
+    fn rr_carry() {
+        let mut accumulator = 0b10101010;
+        // Carry flag
+        let mut flags = 0b00010000;
+        rr(&mut accumulator, &mut flags);
+        assert_eq!(accumulator, 0b01010101);
+        assert_eq!(flags, 0b00000000);
     }
 }
