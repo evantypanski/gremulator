@@ -230,7 +230,7 @@ impl CPU {
             }
             // DAA
             0x27 => {
-                // TODO
+                ::cpu::alu::daa(&mut self.registers.a, &mut self.registers.f);
                 4
             }
             // JR Z,i8

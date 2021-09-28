@@ -1,3 +1,5 @@
+use std::convert::TryInto;
+
 pub fn add(accumulator: &mut u8, val: Option<u8>, flags: &mut u8) {
     let result: u16;
     let to_add = val.unwrap_or(*accumulator);
@@ -135,6 +137,32 @@ pub fn rr(reg: &mut u8, flags: &mut u8) {
     set_flags(flags, false, false, false, bit0_set);
 }
 
+pub fn daa(accumulator: &mut u8, flags: &mut u8) {
+    // Stolen from https://ehaskins.com/2018-01-30%20Z80%20DAA/
+    // TODO: check this when I feel like using my brain. And add tests.
+    let mut correction = 0;
+    let prev_h = h_flag(flags) == 1;
+    let prev_n = n_flag(flags) == 1;
+    if prev_h || (!prev_n && (*accumulator & 0xf) > 9) {
+        correction |= 0x6;
+    }
+
+    let prev_c = c_flag(flags) == 1;
+    let mut set_c = false;
+    if prev_c || (!prev_n && *accumulator > 0x99) {
+        correction |= 0x60;
+        set_c = true;
+    }
+
+    *accumulator = if prev_n {
+        (-1 * correction as i8).try_into().unwrap()
+    } else {
+        correction
+    };
+
+    set_flags(flags, *accumulator == 0, prev_n, false, set_c);
+}
+
 // Utility methods for flags
 fn set_flags(flags: &mut u8, z: bool, n: bool, h: bool, c: bool) {
     *flags = ((z as u8) << 7) | ((n as u8) << 6) | ((h as u8) << 5) | ((c as u8) << 4);
@@ -142,6 +170,14 @@ fn set_flags(flags: &mut u8, z: bool, n: bool, h: bool, c: bool) {
 
 fn c_flag(flags: &u8) -> u8 {
     (flags >> 4) & 1
+}
+
+fn h_flag(flags: &u8) -> u8 {
+    (flags >> 5) & 1
+}
+
+fn n_flag(flags: &u8) -> u8 {
+    (flags >> 6) & 1
 }
 
 #[cfg(test)]
@@ -491,7 +527,6 @@ mod tests {
         // Carry gets set but don't use it.
         assert_eq!(flags, 0b00010000);
     }
-
 
     #[test]
     fn rl_carry() {
