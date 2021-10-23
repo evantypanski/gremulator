@@ -14,4 +14,8 @@ impl MMU {
     pub fn fetch(&self, addr: u16) -> u8 {
         self.mbc.fetch_rom(addr)
     }
+
+    pub fn set_mem_addr(&mut self, addr: u16, val: u8) {
+        self.mbc.set_mem_addr(addr, val);
+    }
 }

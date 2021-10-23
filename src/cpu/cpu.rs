@@ -292,13 +292,28 @@ impl CPU {
                 self.registers.sp = self.registers.sp.wrapping_add(1);
                 8
             }
-            // IMPLEMENT INC (HL)
-            0x34 => 12,
-            // IMPLEMENT DEC (HL)
-            0x35 => 12,
-            // IMPLEMENT LD (HL),n
+            // INC (HL)
+            0x34 => {
+                // TODO: Is there a better way?
+                let mem_addr = self.registers.hl();
+                let mut res = self.mmu.fetch(mem_addr);
+                ::cpu::alu::inc(&mut res, &mut self.registers.f);
+                self.mmu.set_mem_addr(mem_addr, res);
+                12
+            }
+            // DEC (HL)
+            0x35 => {
+                // TODO: Is there a better way?
+                let mem_addr = self.registers.hl();
+                let mut res = self.mmu.fetch(mem_addr);
+                ::cpu::alu::dec(&mut res, &mut self.registers.f);
+                self.mmu.set_mem_addr(mem_addr, res);
+                12
+            }
+            // LD (HL),n
             0x36 => {
-                self.registers.h = self.registers.l;
+                let val = self.fetch_byte();
+                self.mmu.set_mem_addr(self.registers.hl(), val);
                 12
             }
             // SCF
@@ -378,7 +393,7 @@ impl CPU {
                 self.registers.b = self.registers.l;
                 4
             }
-            // IMPLEMENT LD B,(HL)
+            // LD B,(HL)
             0x46 => {
                 self.registers.b = self.mmu.fetch(self.registers.hl());
                 8
@@ -558,34 +573,35 @@ impl CPU {
                 self.registers.l = self.mmu.fetch(self.registers.hl());
                 8
             }
-            // IMPLEMENT LD (HL),B
+            // LD (HL),B
             0x70 => {
-                self.registers.h = self.registers.b;
+                self.mmu.set_mem_addr(self.registers.hl(), self.registers.b);
                 8
             }
-            // IMPLEMENT LD (HL),C
+            // LD (HL),C
             0x71 => {
-                self.registers.h = self.registers.c;
+                self.mmu.set_mem_addr(self.registers.hl(), self.registers.c);
                 8
             }
-            // IMPLEMENT LD (HL),D
+            // LD (HL),D
             0x72 => {
+                self.mmu.set_mem_addr(self.registers.hl(), self.registers.d);
                 self.registers.h = self.registers.d;
                 8
             }
-            // IMPLEMENT LD (HL),E
+            // LD (HL),E
             0x73 => {
-                self.registers.h = self.registers.e;
+                self.mmu.set_mem_addr(self.registers.hl(), self.registers.e);
                 8
             }
-            // IMPLEMENT LD (HL),H
+            // LD (HL),H
             0x74 => {
-                self.registers.h = self.registers.h;
+                self.mmu.set_mem_addr(self.registers.hl(), self.registers.h);
                 8
             }
-            // IMPLEMENT LD (HL),L
+            // LD (HL),L
             0x75 => {
-                self.registers.h = self.registers.l;
+                self.mmu.set_mem_addr(self.registers.hl(), self.registers.l);
                 8
             }
             // HALT
