@@ -380,7 +380,7 @@ impl CPU {
             }
             // IMPLEMENT LD B,(HL)
             0x46 => {
-                self.registers.b = self.registers.l;
+                self.registers.b = self.mmu.fetch(self.registers.hl());
                 8
             }
             // LD C,B
@@ -413,9 +413,9 @@ impl CPU {
                 self.registers.c = self.registers.l;
                 4
             }
-            // IMPLEMENT LD C,(HL)
+            // LD C,(HL)
             0x4E => {
-                self.registers.c = self.registers.l;
+                self.registers.c = self.mmu.fetch(self.registers.hl());
                 8
             }
             // LD D,B
@@ -448,9 +448,9 @@ impl CPU {
                 self.registers.d = self.registers.l;
                 4
             }
-            // IMPLEMENT LD D,(HL)
+            // LD D,(HL)
             0x56 => {
-                self.registers.d = self.registers.l;
+                self.registers.d = self.mmu.fetch(self.registers.hl());
                 8
             }
             // LD E,B
@@ -483,9 +483,9 @@ impl CPU {
                 self.registers.e = self.registers.l;
                 4
             }
-            // IMPLEMENT LD E,(HL)
+            // LD E,(HL)
             0x5E => {
-                self.registers.e = self.registers.l;
+                self.registers.e = self.mmu.fetch(self.registers.hl());
                 8
             }
             // LD H,B
@@ -518,9 +518,9 @@ impl CPU {
                 self.registers.h = self.registers.l;
                 4
             }
-            // IMPLEMENT LD H,(HL)
+            // LD H,(HL)
             0x66 => {
-                self.registers.h = self.registers.l;
+                self.registers.h = self.mmu.fetch(self.registers.hl());
                 8
             }
             // LD L,B
@@ -553,9 +553,9 @@ impl CPU {
                 self.registers.l = self.registers.l;
                 4
             }
-            // IMPLEMENT LD L,(HL)
+            // LD L,(HL)
             0x6E => {
-                self.registers.l = self.registers.l;
+                self.registers.l = self.mmu.fetch(self.registers.hl());
                 8
             }
             // IMPLEMENT LD (HL),B
@@ -624,9 +624,9 @@ impl CPU {
                 self.registers.a = self.registers.l;
                 4
             }
-            // IMPLEMENT LD A,(HL)
+            // LD A,(HL)
             0x7E => {
-                self.registers.a = self.registers.l;
+                self.registers.a = self.mmu.fetch(self.registers.hl());
                 8
             }
             // LD A,A
